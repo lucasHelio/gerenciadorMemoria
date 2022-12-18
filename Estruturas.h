@@ -2,7 +2,7 @@
 #define NUM_PAGINAS_PROCESSO 10
 #define NUM_FRAMES 64
 #define NUM_PROCESSOS 20
-#define TAM_SWAP 500
+#define TAM_SWAP 32
 #define WORK_SET_LIMIT 4
 
 typedef struct _Page
