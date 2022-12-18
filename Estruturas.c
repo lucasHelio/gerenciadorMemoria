@@ -5,32 +5,32 @@
 
 int numProcessos = 0;
 
-Processo *CriaProcesso(int PID)
+Process *CreateProcess(int PID)
 {   
     printf("cria");
-    Processo *processo = (Processo *)malloc(sizeof(Processo));
+    Process *processo = (Process *)malloc(sizeof(Process));
 
     processo->PID = numProcessos++;
     for (int i = 0; i < NUM_PAGINAS_PROCESSO; i++)
     {
-        processo->tabelaPaginas[i] = (FilaElemento *)malloc(sizeof(FilaElemento)); // não está na memória principal
-        processo->tabelaPaginas[i]->pagina = (Pagina *)malloc(sizeof(Pagina));
+        processo->tabelaPaginas[i] = (ElementQueue *)malloc(sizeof(ElementQueue)); // não está na memória principal
+        processo->tabelaPaginas[i]->pagina = (Page *)malloc(sizeof(Page));
         processo->tabelaPaginas[i]->pagina->isInMP = 0;
     }
-    processo->paginasNaMemoriaPrincipal = CriaFila(WORK_SET_LIMIT);
+    processo->paginasNaMemoriaPrincipal = CreateQueue(WORK_SET_LIMIT);
     return processo;
 }
 
-void InsereElementoNaTabelaDePaginas(Processo* processo, FilaElemento* elemento){
+void InsertElementinTP(Process* processo, ElementQueue* elemento){
     processo->tabelaPaginas[elemento->pagina->paginaID] = elemento;
 }
 
-void AlocaPagina(Pagina* pagina, Fila* memoriaPrincipal){
+void AllocPage(Page* pagina, Queue* memoriaPrincipal){
     int alocacoes[NUM_FRAMES];
     memset(alocacoes, 0, sizeof(alocacoes));
 
     // Define a fila dos frames usados
-    FilaElemento *p = memoriaPrincipal->primeiro;
+    ElementQueue *p = memoriaPrincipal->primeiro;
     while (p != NULL)
     {
         if (p->pagina->frameIndex != -1)
@@ -47,9 +47,9 @@ void AlocaPagina(Pagina* pagina, Fila* memoriaPrincipal){
     }
 }
 
-Pagina *CriaPagina(int paginaID, int PID)
+Page *CreatePage(int paginaID, int PID)
 {
-    Pagina *pagina = (Pagina *)malloc(sizeof(Pagina));
+    Page *pagina = (Page *)malloc(sizeof(Page));
 
     pagina->paginaID = paginaID;
     pagina->PID = PID;
@@ -59,13 +59,13 @@ Pagina *CriaPagina(int paginaID, int PID)
 }
 
 // Verifica se duas páginas são iguais
-int Igual(Pagina *a, Pagina *b)
+int Equal(Page *a, Page *b)
 {
     return a->paginaID == b->paginaID && a->PID == b->PID;
 }
 
 // Verifica se duas páginas são iguais
-int Igual2(Pagina *a, int paginaID, int PID)
+int Equal2(Page *a, int paginaID, int PID)
 {
     return a->paginaID == paginaID && a->PID == PID;
 }

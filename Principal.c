@@ -30,26 +30,26 @@ void CriaOrdemAleatoriaDeProcessos(int *processos, size_t processosAtivos)
 }
 
 
-void inserePaginaNaAreaDeSwap(Fila **areaDeSwap, FilaElemento *removido)
+void InsertPageinSwap(Queue **areaDeSwap, ElementQueue *removido)
 {
-    FilaElemento *removidoSwap = Insere(areaDeSwap, removido);
-    if (removidoSwap != (FilaElemento *)NULL)
+    ElementQueue *removidoSwap = Insert(areaDeSwap, removido);
+    if (removidoSwap != (ElementQueue *)NULL)
     {
         printf("ÁREA DE SWAP ESTOROU!!!!\n");
         printf("CONSIDERE AUMENTAR A ÁREA SWAP!!!!\n");
     }
 }
 
-void removeDaMemoriaPrincipal(Fila **memoriaPrincipal, FilaElemento *elementoMP)
+void removeFromMP(Queue **memoriaPrincipal, ElementQueue *elementoMP)
 {
-    if (elementoMP->anterior == (FilaElemento *)NULL)
+    if (elementoMP->anterior == (ElementQueue *)NULL)
     {
         (*memoriaPrincipal)->primeiro = elementoMP->proximo;
-        elementoMP->proximo->anterior = (FilaElemento *)NULL;
+        elementoMP->proximo->anterior = (ElementQueue *)NULL;
     }
-    else if (elementoMP->proximo == (FilaElemento *)NULL)
+    else if (elementoMP->proximo == (ElementQueue *)NULL)
     {
-        elementoMP->anterior->proximo = (FilaElemento *)NULL;
+        elementoMP->anterior->proximo = (ElementQueue *)NULL;
     }
     else
     {
@@ -60,8 +60,8 @@ void removeDaMemoriaPrincipal(Fila **memoriaPrincipal, FilaElemento *elementoMP)
     (*memoriaPrincipal)->size--;
 }
 
-void printMP(Fila *memoriaPrincipal){
-    FilaElemento *elemento = memoriaPrincipal->primeiro;
+void printMP(Queue *memoriaPrincipal){
+    ElementQueue *elemento = memoriaPrincipal->primeiro;
     printf("\n\e[0;32mEspaços alocados da MP\e[0m\n");
     
     for (int i=0; i<memoriaPrincipal->size; i++){
@@ -76,14 +76,14 @@ void printMP(Fila *memoriaPrincipal){
 int main()
 {
     srand(time(NULL));
-    Processo *filaProcessos[NUM_PROCESSOS];
+    Process *filaProcessos[NUM_PROCESSOS];
     int processosAtivos = 0;
     int time_limit = 120;
     int t = 0;
     
     // criar memoria principal
-    Fila *memoriaPrincipal = CriaFila(NUM_FRAMES);
-    Fila *areaDeSwap = CriaFila(TAM_SWAP);
+    Queue *memoriaPrincipal = CreateQueue(NUM_FRAMES);
+    Queue *areaDeSwap = CreateQueue(TAM_SWAP);
     
 
     while (1)
@@ -92,7 +92,7 @@ int main()
         
         // cria um novo processo se necessáro
         if (processosAtivos < NUM_PROCESSOS){
-            filaProcessos[processosAtivos] = CriaProcesso(processosAtivos);
+            filaProcessos[processosAtivos] = CreateProcess(processosAtivos);
             processosAtivos++; // aumenta numero de processos ativos
             printf("\e[0;35m+\e[0m [%03d] Processo #%d criado (%d processo(s))\n", t, processosAtivos-1, processosAtivos);
         }
@@ -104,7 +104,7 @@ int main()
 
         for (int i = 0; i < processosAtivos; i++)
         {
-            Pagina *pagina;
+            Page *pagina;
             int paginaID;
             int PID = processos[i];  // pega o PID do vetor aleatorio de pid's
 
@@ -114,66 +114,66 @@ int main()
             while (filaProcessos[PID]->tabelaPaginas[paginaID]->pagina->isInMP == 1);
             printf("\e[1;36m?\e[0m Pagina %d do processo %d requisitada e não esta na memoria principal.\n", paginaID, PID);
 
-            FilaElemento *elementoSwap = BuscaElemento2(areaDeSwap, paginaID, PID);
+            ElementQueue *elementoSwap = SearchElement2(areaDeSwap, paginaID, PID);
 
              // encontramos na área de swap
-            if (elementoSwap != (FilaElemento *)NULL){ 
+            if (elementoSwap != (ElementQueue *)NULL){ 
                 printf("\e[1;33m>\e[0mPagina %d do processo %d requisitada e esta na area de swap.\n", paginaID, PID);
-                RemoveElemento(&areaDeSwap, elementoSwap); // removemos do swap
+                RemoveElement(&areaDeSwap, elementoSwap); // removemos do swap
             }
 
-            pagina = CriaPagina(paginaID, PID); //alocamos pagina estando ou não no swap
+            pagina = CreatePage(paginaID, PID); //alocamos pagina estando ou não no swap
 
-            FilaElemento *elemento = CriaElemento(memoriaPrincipal, pagina);                                // LRU da memoria principal
-            FilaElemento *elemento2 = CriaElemento(filaProcessos[PID]->paginasNaMemoriaPrincipal, pagina); // LRU do processo
+            ElementQueue *elemento = CreateElement(memoriaPrincipal, pagina);                                // LRU da memoria principal
+            ElementQueue *elemento2 = CreateElement(filaProcessos[PID]->paginasNaMemoriaPrincipal, pagina); // LRU do processo
 
             if (filaProcessos[PID]->paginasNaMemoriaPrincipal->size < WORK_SET_LIMIT)
             {
                 
-                FilaElemento *removido = Insere(&memoriaPrincipal, elemento);
+                ElementQueue *removido = Insert(&memoriaPrincipal, elemento);
                 pagina->isInMP = 1;
-                AlocaPagina(pagina, memoriaPrincipal);
+                AllocPage(pagina, memoriaPrincipal);
                 printf("\n\e[1;31mx\e[0m Processo %d não atingiu working set limit.\n", PID);
 
 
-                if (removido != (FilaElemento *)NULL)
+                if (removido != (ElementQueue *)NULL)
                 {
                     int processID = removido->pagina->PID;
-                    RemoveElemento(&(filaProcessos[processID]->paginasNaMemoriaPrincipal), removido);
+                    RemoveElement(&(filaProcessos[processID]->paginasNaMemoriaPrincipal), removido);
                     filaProcessos[processID]->tabelaPaginas[removido->pagina->paginaID]->pagina->isInMP = 0;
                     removido->pagina->isInMP = 0;
-                    inserePaginaNaAreaDeSwap(&areaDeSwap, removido);
+                    InsertPageinSwap(&areaDeSwap, removido);
                 }
 
                 // Atualiza LRU do Processo que alocou a pagina
-                Insere(&(filaProcessos[PID]->paginasNaMemoriaPrincipal), elemento2);
+                Insert(&(filaProcessos[PID]->paginasNaMemoriaPrincipal), elemento2);
 
                 // Atualiza tabela de paginas do Processo que alocou a pagina
-                InsereElementoNaTabelaDePaginas(filaProcessos[PID], elemento);
+                InsertElementinTP(filaProcessos[PID], elemento);
 
             }
             else
             {
                 printf("\n\n\e[1;32mv\e[0m Processo %d atingiu working set limit.\n", PID);
                 //  Atualiza LRU do Processo que alocou a pagina
-                FilaElemento *removido = Insere(&(filaProcessos[PID]->paginasNaMemoriaPrincipal), elemento2);
+                ElementQueue *removido = Insert(&(filaProcessos[PID]->paginasNaMemoriaPrincipal), elemento2);
                 pagina->isInMP = 1;
                 // pega ponteiro da tabela de paginas da pagina a ser removida
-                FilaElemento *elementoMP = filaProcessos[PID]->tabelaPaginas[removido->pagina->paginaID];
-                removeDaMemoriaPrincipal(&memoriaPrincipal, elementoMP);
+                ElementQueue *elementoMP = filaProcessos[PID]->tabelaPaginas[removido->pagina->paginaID];
+                removeFromMP(&memoriaPrincipal, elementoMP);
                 
 
                 // remove da tabela de paginas
                 filaProcessos[PID]->tabelaPaginas[removido->pagina->paginaID]->pagina->isInMP = 0;
 
-                Insere(&memoriaPrincipal, elemento);
+                Insert(&memoriaPrincipal, elemento);
 
-                AlocaPagina(pagina, memoriaPrincipal);
+                AllocPage(pagina, memoriaPrincipal);
                 //removido->pagina->isInMP = 0;
-                inserePaginaNaAreaDeSwap(&areaDeSwap, removido);
+                InsertPageinSwap(&areaDeSwap, removido);
 
                 // Atualiza tabela de paginas do Processo que alocou a pagina
-                InsereElementoNaTabelaDePaginas(filaProcessos[PID], elemento);
+                InsertElementinTP(filaProcessos[PID], elemento);
 
             }
 

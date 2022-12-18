@@ -5,47 +5,47 @@
 #define TAM_SWAP 500
 #define WORK_SET_LIMIT 4
 
-typedef struct _Pagina
+typedef struct _Page
 {
     int paginaID;
     int PID;
     int isInMP;
     int frameIndex;                 // usado para identificar o frame de alocacao (ignorar nos outros locais)
-} Pagina;
+} Page;
 
-typedef struct _FilaElemento
+typedef struct _ElementQueue
 {
-    struct _FilaElemento *anterior;
-    Pagina *pagina;
-    struct _FilaElemento *proximo;
-} FilaElemento;
+    struct _ElementQueue *anterior;
+    Page *pagina;
+    struct _ElementQueue *proximo;
+} ElementQueue;
 
 
-typedef struct _Fila
+typedef struct _Queue
 {
     int size;
     int tamanhoMaximo;
-    FilaElemento *primeiro;
-} Fila;
+    ElementQueue *primeiro;
+} Queue;
 
-typedef struct _Processo
+typedef struct _Process
 {
     int PID;
-    FilaElemento *tabelaPaginas[NUM_PAGINAS_PROCESSO];
-    Fila *paginasNaMemoriaPrincipal;
-} Processo;
+    ElementQueue *tabelaPaginas[NUM_PAGINAS_PROCESSO];
+    Queue *paginasNaMemoriaPrincipal;
+} Process;
 
-Processo *CriaProcesso(int PID);
-Fila *CriaFila(int tamanhoMaximo);
-Pagina *CriaPagina(int paginaID, int PID);
-FilaElemento *CriaElemento(Fila *, Pagina *pagina);
-FilaElemento *BuscaElemento(Fila *fila, Pagina *pagina);
-FilaElemento *BuscaElemento2(Fila *fila, int paginaID, int PID);
-void RemoveElemento(Fila **fila, FilaElemento *elemento);
-FilaElemento *RemovePrimeiro(Fila **fila);
-int Possui(Fila *fila, FilaElemento *elemento);
-int Igual(Pagina *a, Pagina *b);
-int Igual2(Pagina *a, int paginaID, int PID);
-FilaElemento *Insere(Fila **fila, FilaElemento *elemento);
-void AlocaPagina(Pagina* pagina, Fila* memoriaPrincipal);
-void InsereElementoNaTabelaDePaginas(Processo *processo, FilaElemento *elemento);
+Process *CreateProcess(int PID);
+Queue *CreateQueue(int tamanhoMaximo);
+Page *CreatePage(int paginaID, int PID);
+ElementQueue *CreateElement(Queue *, Page *pagina);
+ElementQueue *SearchElement(Queue *fila, Page *pagina);
+ElementQueue *SearchElement2(Queue *fila, int paginaID, int PID);
+void RemoveElement(Queue **fila, ElementQueue *elemento);
+ElementQueue *RemoveFirst(Queue **fila);
+int Possui(Queue *fila, ElementQueue *elemento);
+int Equal(Page *a, Page *b);
+int Equal2(Page *a, int paginaID, int PID);
+ElementQueue *Insert(Queue **fila, ElementQueue *elemento);
+void AllocPage(Page* pagina, Queue* memoriaPrincipal);
+void InsertElementinTP(Process *processo, ElementQueue *elemento);
