@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "Estruturas.h"
+#include "Struct.h"
 
 int numProcessos = 0;
 
