@@ -11,13 +11,13 @@ Process *CreateProcess(int PID)
     Process *processo = (Process *)malloc(sizeof(Process));
 
     processo->PID = numProcessos++;
-    for (int i = 0; i < NUM_PAGINAS_PROCESSO; i++)
+    for (int i = 0; i < MAX_PAGINAS_PROCESSO; i++)
     {
         processo->tabelaPaginas[i] = (ElementQueue *)malloc(sizeof(ElementQueue)); // não está na memória principal
         processo->tabelaPaginas[i]->pagina = (Page *)malloc(sizeof(Page));
         processo->tabelaPaginas[i]->pagina->isInMP = 0;
     }
-    processo->paginasNaMemoriaPrincipal = CreateQueue(WORK_SET_LIMIT);
+    processo->paginasNaMemoriaPrincipal = CreateQueue(WORKING_SET_LIMIT);
     return processo;
 }
 
@@ -26,7 +26,7 @@ void InsertElementinTP(Process* processo, ElementQueue* elemento){
 }
 
 void AllocPage(Page* pagina, Queue* memoriaPrincipal){
-    int alocacoes[NUM_FRAMES];
+    int alocacoes[MAX_FRAMES];
     memset(alocacoes, 0, sizeof(alocacoes));
 
     // Define a fila dos frames usados
@@ -39,7 +39,7 @@ void AllocPage(Page* pagina, Queue* memoriaPrincipal){
     }
 
     // Encontra um frame vazio
-    for(int i=0; i<NUM_FRAMES; i++){
+    for(int i=0; i<MAX_FRAMES; i++){
         if(alocacoes[i] == 0){
             pagina->frameIndex = i;
             return;

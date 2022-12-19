@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
-
 #include "Estruturas.h"
 
-// Cria uma referencia para nova fila
+
+// Cria uma fila
 Queue *CreateQueue(int tamanhoMaximo)
 {
     Queue *fila = (Queue *)malloc(sizeof(Queue));
@@ -14,7 +14,7 @@ Queue *CreateQueue(int tamanhoMaximo)
 }
 
 
-// Busca um elemento da fila
+// Procura um elemento da fila
 ElementQueue *SearchElement(Queue *fila, Page *pagina)
 {
     ElementQueue *p = fila->primeiro;
@@ -24,7 +24,7 @@ ElementQueue *SearchElement(Queue *fila, Page *pagina)
     return p;
 }
 
-// Cria um elemento de fila
+// Cria um elemento
 ElementQueue *CreateElement(Queue *fila, Page *pagina)
 {
     ElementQueue *elemento = SearchElement(fila, pagina);
@@ -38,10 +38,10 @@ ElementQueue *CreateElement(Queue *fila, Page *pagina)
     return elemento;
 }
 
-// Assumindo que o elemento está na fila, move-o para o final dela
+// Move o elemento para o final da fila
 void MoveElementoParaOFinal(Queue **fila, ElementQueue *elemento)
 {
-    // Se o elemento já não estiver no final
+    // Se o elemento não estiver no final
     if (elemento->proximo != NULL)
     {
         ElementQueue *p = (*fila)->primeiro;
@@ -74,7 +74,6 @@ void MoveElementoParaOFinal(Queue **fila, ElementQueue *elemento)
             elemento->anterior = q;
         }
     }
-
     elemento->proximo = (*fila)->primeiro;
     (*fila)->primeiro->anterior = elemento;
 }
@@ -82,17 +81,17 @@ void MoveElementoParaOFinal(Queue **fila, ElementQueue *elemento)
 ElementQueue *RemoveFirst(Queue **fila)
 {
     ElementQueue *p = (*fila)->primeiro;
+    if(p->proximo != NULL)
     (*fila)->primeiro = p->proximo;
     (*fila)->primeiro->anterior = NULL;
     return p;
 }
 
-// Insere um elemento de fila
+// Insere um elemento na fila
 ElementQueue *Insert(Queue **fila, ElementQueue *elemento)
 {
-    // printf("Fila: (%d,%d)", (*fila)->size, (*fila)->tamanhoMaximo);
     ElementQueue *elementoRemovido = (ElementQueue *)NULL;
-    if (Possui(*fila, elemento))
+    if (IsInQueue(*fila, elemento))
     {
         MoveElementoParaOFinal(fila, elemento);
     }
@@ -129,7 +128,7 @@ ElementQueue *Insert(Queue **fila, ElementQueue *elemento)
     return elementoRemovido;
 }
 
-// Busca um elemento da fila
+// Procura um elemento
 ElementQueue *SearchElement2(Queue *fila, int paginaID, int PID)
 {
     ElementQueue *p = fila->primeiro;
@@ -139,8 +138,8 @@ ElementQueue *SearchElement2(Queue *fila, int paginaID, int PID)
     return p;
 }
 
-// Verifica se fila possui elemento
-int Possui(Queue *fila, ElementQueue *elemento)
+// Verifica se elemento está na fila
+int IsInQueue(Queue *fila, ElementQueue *elemento)
 {
     int filaPossuiElemento = 0;
     ElementQueue *p = fila->primeiro;
@@ -164,7 +163,7 @@ int Possui(Queue *fila, ElementQueue *elemento)
 // Remove um elemento de fila
 void RemoveElement(Queue **fila, ElementQueue *elemento)
 {
-    if (Possui(*fila, elemento))
+    if (IsInQueue(*fila, elemento))
     {
         ElementQueue *p = (*fila)->primeiro;
         if (Equal(p->pagina, elemento->pagina))

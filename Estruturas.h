@@ -1,16 +1,16 @@
 
-#define NUM_PAGINAS_PROCESSO 10
-#define NUM_FRAMES 64
-#define NUM_PROCESSOS 20
-#define TAM_SWAP 32
-#define WORK_SET_LIMIT 4
+#define MAX_FRAMES 64
+#define MAX_SWAP 32
+#define MAX_PROCESSOS 20
+#define MAX_PAGINAS_PROCESSO 10
+#define WORKING_SET_LIMIT 4
 
 typedef struct _Page
 {
     int paginaID;
     int PID;
     int isInMP;
-    int frameIndex;                 // usado para identificar o frame de alocacao (ignorar nos outros locais)
+    int frameIndex;                 // usado para identificar o frame de alocacao
 } Page;
 
 typedef struct _ElementQueue
@@ -31,7 +31,7 @@ typedef struct _Queue
 typedef struct _Process
 {
     int PID;
-    ElementQueue *tabelaPaginas[NUM_PAGINAS_PROCESSO];
+    ElementQueue *tabelaPaginas[MAX_PAGINAS_PROCESSO];
     Queue *paginasNaMemoriaPrincipal;
 } Process;
 
@@ -43,7 +43,7 @@ ElementQueue *SearchElement(Queue *fila, Page *pagina);
 ElementQueue *SearchElement2(Queue *fila, int paginaID, int PID);
 void RemoveElement(Queue **fila, ElementQueue *elemento);
 ElementQueue *RemoveFirst(Queue **fila);
-int Possui(Queue *fila, ElementQueue *elemento);
+int IsInQueue(Queue *fila, ElementQueue *elemento);
 int Equal(Page *a, Page *b);
 int Equal2(Page *a, int paginaID, int PID);
 ElementQueue *Insert(Queue **fila, ElementQueue *elemento);
