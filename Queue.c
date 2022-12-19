@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "Estruturas.h"
+#include "Struct.h"
 
 
 // Cria uma fila
